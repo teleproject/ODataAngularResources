@@ -1197,6 +1197,8 @@ factory('$odataProvider', ['$odataOperators', '$odataBinaryOperation', '$odataPr
                 defaultResponseInterceptor;
               var responseErrorInterceptor = action.interceptor && action.interceptor.responseError ||
                 undefined;
+              var requestInterceptor = action.interceptor && action.interceptor.response ||
+                undefined;
 
               addRefreshMethod(value, persistence);
 
@@ -1370,6 +1372,8 @@ factory('$odataProvider', ['$odataOperators', '$odataBinaryOperation', '$odataPr
                     return $q.when({ data: response, headers: function() { return null; }}).then(httpSuccessHandler);
                 }
 
+                httpConfig = requestInterceptor(httpConfig);
+                
                 var promise = $http(httpConfig)
                     .then(httpSuccessHandler, httpErrorHandler)         // Http response phase (transform response into final Resource object and call interceptors)
                     .then(callbackSuccessHandler, callbackErrorHandler);// Callback phase (errorCallback has opportrunity to address issues from errors being thrown in http response phase)

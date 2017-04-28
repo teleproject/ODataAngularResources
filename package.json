@@ -1,6 +1,6 @@
 {
   "name": "angular-odata-resources",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Allows making fluent OData queries from angular resources",
   "main": "build/odataresources.js",
   "scripts": {
