@@ -659,6 +659,39 @@
                 expect(successInterceptor.calls.mostRecent().args[0].status).toBe(204);
                 expect(successInterceptor.calls.mostRecent().args[0].statusText).toBe('No Content');
             });
+            it('*****************************************(interceptor request)', function () {
+                var successInterceptor = jasmine.createSpy('sucessInterceptor');
+                var Products = $odataresource('/Products', {}, {
+                    rate: {
+                        method: 'PUT',
+                        url: '/Products(:productId)/ProductService.Rate',
+                        params: {
+                            productId: '@ProductID',
+                        },
+                        interceptor: {
+                            response: successInterceptor,
+                            request: function(config) {
+                                console.log(config); 
+                                return config;
+                            }
+                        },
+                    },
+                }, { odatakey: 'ProductID' });
+                $httpBackend.expectGET('/Products(5)')
+                    .respond(200, { ProductID: 5, Rating: 9 });
+                var product = Products.odata().get(5);
+                $httpBackend.flush();
+                expect(product.ProductID).toBe(5);
+                expect(product.Rating).toBe(9);
+                $httpBackend.expectPUT("/Products(5)/ProductService.Rate")
+                    .respond(204, undefined, undefined, 'No Content');
+                product.Rating = 10;
+                product.$rate();
+                $httpBackend.flush();
+                expect(successInterceptor).toHaveBeenCalled();
+                expect(successInterceptor.calls.mostRecent().args[0].status).toBe(204);
+                expect(successInterceptor.calls.mostRecent().args[0].statusText).toBe('No Content');
+            });
         });
         describe('OData v4 not explicitly specified', function() {
             var User;
